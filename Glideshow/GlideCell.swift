@@ -81,7 +81,7 @@ class GlideCell: UICollectionViewCell {
         let label = GlideLabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
@@ -92,7 +92,7 @@ class GlideCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         label.textColor = .white
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
@@ -101,7 +101,7 @@ class GlideCell: UICollectionViewCell {
         let label = GlideLabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
-        label.numberOfLines = 0
+        label.numberOfLines = 3
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         return label
     }()
