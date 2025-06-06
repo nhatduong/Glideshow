@@ -61,7 +61,18 @@ class GlideCell: UICollectionViewCell {
         didSet{
             slide.insertSubview(imageView, at: 0)
             imageView.frame = slide.bounds
-            imageView.image = backgroundImage
+            imageView.image = blurThenDarkenImage(image: (backgroundImage ?? UIImage(named: "thumbDefault"))!, blurRadius: 3, darkenAlpha: 0.4)
+            
+            
+            slide.insertSubview(imageItemView, at: 2)
+            imageItemView.frame = CGRect(x: 24, y: 24, width: 85, height: 115)
+            imageItemView.image = backgroundImage
+            imageItemView.contentMode = .scaleAspectFill
+            imageItemView.layer.cornerRadius = 8
+            imageItemView.layer.masksToBounds = true
+            imageItemView.layer.borderWidth = 1
+            imageItemView.layer.borderColor = UIColor.gray.cgColor
+            
         }
     }
     
@@ -71,7 +82,7 @@ class GlideCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 14, weight: .light)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
     
@@ -79,7 +90,7 @@ class GlideCell: UICollectionViewCell {
     public var slideTitle : GlideLabel = {
         let label = GlideLabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 20, weight: .black)
+        label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         label.textColor = .white
         label.numberOfLines = 0
         return label
@@ -91,7 +102,7 @@ class GlideCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         return label
     }()
     
@@ -140,7 +151,7 @@ class GlideCell: UICollectionViewCell {
     }()
     
     /// Spacing between labels of the slide. Default value : 8
-    public var labelSpacing : CGFloat = 8
+    public var labelSpacing : CGFloat!
     
     /// Animateable GlideLabels for gliding
     public var animateableViews : [GlideLabel]?
@@ -152,14 +163,14 @@ class GlideCell: UICollectionViewCell {
         }
     }
     
-    /// glide factor for the description lable. Default: 3
+    /// glide factor for the description lable. Default: 2
     public var descriptionGlideFactor : CGFloat = 3 {
         didSet{
             slideDescription.glideFactor = titleGlideFactor
         }
     }
     
-    /// glide factor for the title lable. Default: 1
+    /// glide factor for the title lable. Default: 2
     public var captionGlideFactor : CGFloat = 1 {
         didSet{
             slideCaption.glideFactor = titleGlideFactor
@@ -172,6 +183,12 @@ class GlideCell: UICollectionViewCell {
        let imgView = UIImageView()
         imgView.contentMode = .scaleAspectFill
         return imgView
+    }()
+    
+    public lazy var imageItemView : UIImageView = {
+       let imageItemView = UIImageView()
+        imageItemView.contentMode = .scaleAspectFill
+        return imageItemView
     }()
     
     /// Maximum width of a GlideLabel. Calculated using leading inset of cell
@@ -199,6 +216,7 @@ class GlideCell: UICollectionViewCell {
         super.prepareForReuse()
         if backgroundImage != nil {
             imageView.image = nil
+            imageItemView.image = nil
         }
         if #available(iOS 13, *) {
             cancellable?.cancel()
@@ -242,6 +260,7 @@ class GlideCell: UICollectionViewCell {
                 }
             } else {
                 imageView.loadImage(urlString: item.imgURL!)
+                imageItemView = imageView
             }
         }
         layoutIfNeeded()
@@ -303,13 +322,9 @@ class GlideCell: UICollectionViewCell {
     /// Positioning title GlideLabel
     private func setTitle(){
         let titleHeight = slideTitle.getHeight(withMaxWidth: animateableMaxWidth)
-        //getting Y value based on heights of content
-        let yByHeight = slide.frame.height - slideDescription.frame.height - titleHeight
-        //getting Y value based on constants such as leading inset and user defined spacing
-        let yByConstants = slide.layoutMargins.left + labelSpacing
-        
+
         //setting frame
-        slideTitle.frame = CGRect(x: slide.layoutMargins.left, y: yByHeight - yByConstants, width: animateableMaxWidth, height: titleHeight)
+        slideTitle.frame = CGRect(x: 127, y: imageItemView.layoutMargins.top + 10, width: animateableMaxWidth, height: titleHeight)
     }
     
     /// Positioning description GlideLabel
@@ -317,26 +332,20 @@ class GlideCell: UICollectionViewCell {
         let descriptionHeight = slideDescription.getHeight(withMaxWidth: animateableMaxWidth)
         
         //setting frame
-        slideDescription.frame = CGRect(x: slide.layoutMargins.left, y: slide.frame.height - slide.layoutMargins.bottom - descriptionHeight, width: animateableMaxWidth, height: descriptionHeight)
+        slideDescription.frame = CGRect(x: 127, y: slideCaption.frame.origin.y + slideCaption.frame.height + 26, width: animateableMaxWidth, height: descriptionHeight)
     }
     
     /// Positioning caption GlideLabel
     private func setCaption(){
         let captionHeight = slideCaption.getHeight(withMaxWidth: animateableMaxWidth)
-        
-        //getting Y value based on heights of content excluding captionHeight
-        let yByHeights = slide.frame.height - slideDescription.frame.height - slideTitle.frame.height
-        
-        //getting Y value based on constants such as leading inset and user defined spacing
-        let yByConstants = slide.layoutMargins.bottom + (labelSpacing * 2)
-        
+
         //setting frame
-        slideCaption.frame = CGRect(x: slide.layoutMargins.left, y: yByHeights - yByConstants - captionHeight, width: animateableMaxWidth, height: captionHeight)
+        slideCaption.frame = CGRect(x: 127, y: slideTitle.frame.origin.y + slideTitle.frame.height + 8, width: animateableMaxWidth, height: captionHeight)
     }
     
     /// setting variable that holds maximum width of content in the slide
     private func setAnimateableMaxWidth(){
-        animateableMaxWidth = slide.frame.width - layoutMargins.left - layoutMargins.right
+        animateableMaxWidth = slide.frame.width - layoutMargins.left - layoutMargins.right - 100
     }
         
     /// Sets content holder frame based on given slide type
@@ -349,6 +358,53 @@ class GlideCell: UICollectionViewCell {
         )
         slide.layer.cornerRadius = 10
     }
+    
+    private func setupBlurView(viewImg: UIView) {
+//        viewImg.backgroundColor = .clear
+        
+        let blurEffect = UIBlurEffect(style: .dark)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = viewImg.bounds
+        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        blurEffectView.layer.opacity = 0.8
+
+        viewImg.addSubview(blurEffectView)
+    }
+    
+    private func blurThenDarkenImage(image: UIImage, blurRadius: Double, darkenAlpha: CGFloat) -> UIImage? {
+        guard let ciImage = CIImage(image: image) else { return nil }
+
+        // Step 1: Làm mờ
+        let blurFilter = CIFilter(name: "CIGaussianBlur")
+        blurFilter?.setValue(ciImage, forKey: kCIInputImageKey)
+        blurFilter?.setValue(blurRadius, forKey: kCIInputRadiusKey)
+        guard let blurredImage = blurFilter?.outputImage else { return nil }
+
+        // Render ảnh mờ ra CGImage
+        let context = CIContext()
+        let cropRect = ciImage.extent
+        guard let cgImageBlurred = context.createCGImage(blurredImage, from: cropRect) else { return nil }
+
+        // Tạo UIImage từ CGImage
+        let blurredUIImage = UIImage(cgImage: cgImageBlurred)
+
+        // Vẽ lại ảnh với lớp phủ đen để làm tối
+        UIGraphicsBeginImageContextWithOptions(blurredUIImage.size, false, blurredUIImage.scale)
+        guard let ctx = UIGraphicsGetCurrentContext() else { return nil }
+
+        blurredUIImage.draw(at: .zero)
+
+        ctx.setFillColor(UIColor(white: 0, alpha: darkenAlpha).cgColor)
+        ctx.fill(CGRect(origin: .zero, size: blurredUIImage.size))
+
+        let finalImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return finalImage
+    }
+
+
+
 }
 
 //MARK: Extensions - GlideableCellDelegate
@@ -370,7 +426,7 @@ extension GlideCell : GlideableCellDelegate{
         // Traverses all animateables in animateableViews to glide and set alpha  based on calculated labelOffset
         animateableViews?.forEach{
             glideFactor = $0.glideFactor
-            labelOffset =  (glideFactor * offset) + slide.layoutMargins.left
+            labelOffset =  (glideFactor * offset) + 127
 
             // setting alpha value of label based on current labelOffset
             if !isProminent && labelOffset != slide.layoutMargins.left {
