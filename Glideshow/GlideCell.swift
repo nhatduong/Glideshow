@@ -92,7 +92,7 @@ class GlideCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         label.textColor = .white
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         return label
     }()
     
