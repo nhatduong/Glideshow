@@ -65,7 +65,7 @@ class GlideCell: UICollectionViewCell {
             
             
             slide.insertSubview(imageItemView, at: 2)
-            imageItemView.frame = CGRect(x: 24, y: 24, width: 85, height: 115)
+            imageItemView.frame = CGRect(x: 12, y: 12, width: 89, height: 139)
             imageItemView.image = backgroundImage
             imageItemView.contentMode = .scaleAspectFill
             imageItemView.layer.cornerRadius = 8
@@ -81,7 +81,7 @@ class GlideCell: UICollectionViewCell {
         let label = GlideLabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
-        label.numberOfLines = 1
+        label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
@@ -92,7 +92,7 @@ class GlideCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         label.textColor = .white
-        label.numberOfLines = 2
+        label.numberOfLines = 0
         return label
     }()
     
@@ -101,7 +101,7 @@ class GlideCell: UICollectionViewCell {
         let label = GlideLabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
-        label.numberOfLines = 3
+        label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         return label
     }()
@@ -324,7 +324,7 @@ class GlideCell: UICollectionViewCell {
         let titleHeight = slideTitle.getHeight(withMaxWidth: animateableMaxWidth)
 
         //setting frame
-        slideTitle.frame = CGRect(x: 127, y: imageItemView.layoutMargins.top + 10, width: animateableMaxWidth, height: titleHeight)
+        slideTitle.frame = CGRect(x: 113, y: imageItemView.layoutMargins.top + 8, width: animateableMaxWidth, height: titleHeight)
     }
     
     /// Positioning description GlideLabel
@@ -332,7 +332,7 @@ class GlideCell: UICollectionViewCell {
         let descriptionHeight = slideDescription.getHeight(withMaxWidth: animateableMaxWidth)
         
         //setting frame
-        slideDescription.frame = CGRect(x: 127, y: slideCaption.frame.origin.y + slideCaption.frame.height + 26, width: animateableMaxWidth, height: descriptionHeight)
+        slideDescription.frame = CGRect(x: 113, y: slide.frame.origin.y + 110, width: animateableMaxWidth, height: descriptionHeight)
     }
     
     /// Positioning caption GlideLabel
@@ -340,7 +340,7 @@ class GlideCell: UICollectionViewCell {
         let captionHeight = slideCaption.getHeight(withMaxWidth: animateableMaxWidth)
 
         //setting frame
-        slideCaption.frame = CGRect(x: 127, y: slideTitle.frame.origin.y + slideTitle.frame.height + 8, width: animateableMaxWidth, height: captionHeight)
+        slideCaption.frame = CGRect(x: 113, y: slideTitle.frame.origin.y + slideTitle.frame.height + 4, width: animateableMaxWidth, height: captionHeight)
     }
     
     /// setting variable that holds maximum width of content in the slide
@@ -426,7 +426,7 @@ extension GlideCell : GlideableCellDelegate{
         // Traverses all animateables in animateableViews to glide and set alpha  based on calculated labelOffset
         animateableViews?.forEach{
             glideFactor = $0.glideFactor
-            labelOffset =  (glideFactor * offset) + 127
+            labelOffset =  (glideFactor * offset) + 113
 
             // setting alpha value of label based on current labelOffset
             if !isProminent && labelOffset != slide.layoutMargins.left {
